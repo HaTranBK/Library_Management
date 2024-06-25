@@ -28,12 +28,16 @@ const BookTable = ({ books, handleDelete, handleEdit }) => {
                   </button>
                 </td>
                 <td>
-                  <button
-                    className="btn btn-danger me-2"
-                    onClick={() => handleDelete(book._id)}
-                  >
-                    X
-                  </button>
+                  {book.status ? (
+                    <button
+                      className="btn btn-danger me-2"
+                      onClick={() => handleDelete(book._id)}
+                    >
+                      X
+                    </button>
+                  ) : (
+                    ""
+                  )}
                   <button
                     className="btn btn-warning"
                     onClick={() => handleEdit(book._id)}
