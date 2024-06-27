@@ -1,6 +1,5 @@
 import { bookModel } from "../model/BooksModel.js";
-
-export const getRequest = async (req, res) => {
+export const getBooks = async (req, res) => {
   try {
     const dataGot = await bookModel.find({});
     res.status(200).json(dataGot);
@@ -9,19 +8,24 @@ export const getRequest = async (req, res) => {
     res.status(500).json({ error });
   }
 };
-export const getGivenRequest = async (req, res) => {
+
+export const getGivenBook = async (req, res) => {
   try {
-    const bookId = req.params.id;
-    const bookExtrated = await bookModel.findById({ _id: bookId });
+    const { id, name_ } = req.params;
+    console.log("id name: ", id, name_);
+    const bookExtrated = await bookModel.findOne({
+      $or: [{ _id: id }, { name: name_ }],
+    });
     if (!bookExtrated) {
-      return res.status(404).json("Book bot found !");
+      return res.status(202).json("Book not found !");
     }
     res.status(200).json(bookExtrated);
   } catch (error) {
     res.status(500).json({ error });
   }
 };
-export const postRequest = async (req, res) => {
+
+export const createBook = async (req, res) => {
   try {
     const bodyData = req.body;
     const newData = new bookModel(bodyData);
@@ -34,14 +38,16 @@ export const postRequest = async (req, res) => {
   }
 };
 
-export const putRequest = async (req, res) => {
+export const updateBook = async (req, res) => {
   try {
-    const bookId = req.params.id;
+    const id = req.params.id;
     const bodyData = req.body; //lấy dữ liệu ở phía client gửi về.
     const updatedBook = await bookModel.findOneAndUpdate(
-      { _id: bookId },
-      { $set: bodyData },
-      { new: true }
+      {
+        _id: id,
+      },
+      bodyData,
+      { new: true } //nếu new bằng false thì data được trả về là vesion cũ.
     );
     res.status(200).json(updatedBook);
   } catch (error) {
@@ -50,7 +56,7 @@ export const putRequest = async (req, res) => {
   }
 };
 
-export const deleteRequest = async (req, res) => {
+export const deleteBook = async (req, res) => {
   try {
     const bookId = req.params.id;
     const deletedBook = await bookModel.deleteOne({ _id: bookId });

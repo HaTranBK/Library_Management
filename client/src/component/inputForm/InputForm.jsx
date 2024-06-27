@@ -5,21 +5,19 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/esm/Col";
 import "./inputForm.css";
 import React from "react";
-import axios from "axios";
 import PropTypes from "prop-types";
 import Button from "react-bootstrap/Button";
+import { CreateBook, GetBooks, UpdateBook } from "../../utils/utils";
 const InputForm = React.memo(({ setBooks, inForBook, setInForBook }) => {
   console.log("rerender component inputform 19");
+
   const handleChange = (e) => {
     let { id, value } = e.target;
     setInForBook({ ...inForBook, [id]: value });
   };
-  //   function fetchData() {
-  //     axios
-  //       .get("http://localhost:8000/books")
-  //       .then((res) => setBooks(res.data))
-  //       .catch((err) => console.log("err from get in handleSubmit: ", err));
-  //   }
+
+  console.log("re render input form 24");
+
   function fetchDataInput() {
     setInForBook({
       name: "",
@@ -28,20 +26,20 @@ const InputForm = React.memo(({ setBooks, inForBook, setInForBook }) => {
       status: "",
       borrowDay: "",
     });
-    axios
-      .get("http://localhost:8000/books")
+    GetBooks()
       .then((res) => {
         setBooks(res.data);
         console.log("bạn đang axios get trong handlesubmit");
       })
       .catch((err) => console.log("err from get in handleSubmit: ", err));
   }
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (inForBook._id) {
       console.log("bạn đang vào if của submit ", inForBook._id);
-      axios
-        .put("http://localhost:8000/books/update/" + inForBook._id, inForBook)
+      UpdateBook(inForBook._id, inForBook)
         .then((res) => {
           console.log("bạn cập nhật thành công trong update: ", res.data);
           fetchDataInput();
@@ -51,8 +49,7 @@ const InputForm = React.memo(({ setBooks, inForBook, setInForBook }) => {
         );
     } else {
       console.log("bạn đang vào else của submit");
-      axios
-        .post("http://localhost:8000/books", inForBook)
+      CreateBook(inForBook)
         .then((res) => {
           console.log("post successfully: ", res.data);
           fetchDataInput();

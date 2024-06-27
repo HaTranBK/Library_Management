@@ -4,37 +4,64 @@ import { useEffect, useState } from "react";
 import BookTable from "../BookTable/BookTable";
 import BorrowedBooks from "../BorrowedBooks/BorrowedBooks";
 import InputForm from "../inputForm/InputForm";
-import axios from "axios";
-
+import moment from "moment";
+import {
+  DeleteBook,
+  GetBooks,
+  GetRentingBook,
+  GetBookById,
+} from "../../utils/utils";
 const LBManager = () => {
-  let [books, setBooks] = useState([]);
-  let [inForBook, setInForBook] = useState({
+  const [books, setBooks] = useState([]);
+  const [rentingbooks, setRentingBooks] = useState([]);
+  const [inForBook, setInForBook] = useState({
     name: "",
     author: "",
     year: "",
     status: "",
     borrowDay: "",
   });
+  const [rentingbook, setRentingBook] = useState({
+    borrowername: "",
+    name: "",
+    mssv: "",
+    borrowday: "",
+    id: "",
+  });
+
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/books")
+    GetBooks()
       .then((res) => {
         console.log("res: ", res);
         setBooks(res.data);
       })
       .catch((err) => console.log("lỗi ở useeffect: ", err));
+    fetchRentingBook();
   }, []);
+
+  const handleChange = (e) => {
+    let { id, value } = e.target;
+    setRentingBook((prev) => {
+      return { ...prev, [id]: value };
+    });
+  };
+
   function fetchData() {
-    axios
-      .get("http://localhost:8000/books")
+    GetBooks()
       .then((res) => setBooks(res.data))
       .catch((err) => {
         console.log("lỗi ở lấy data axios get trong hàm xóa: ", err);
       });
   }
+  function fetchRentingBook() {
+    GetRentingBook()
+      .then((res) => setRentingBooks(res.data))
+      .catch((err) => {
+        console.log("lỗi ở lấy renting books axios get trong hàm xóa: ", err);
+      });
+  }
   function handleDelete(id) {
-    axios
-      .delete("http://localhost:8000/books/" + id)
+    DeleteBook(id)
       .then(() => {
         console.log("delete successfully");
         fetchData();
@@ -43,15 +70,12 @@ const LBManager = () => {
         console.log("lỗi xóa book", err);
       });
   }
+
   function handleEdit(id) {
-    axios
-      .get("http://localhost:8000/books/" + id)
+    GetBookById(id)
       .then((res) => {
-        let gotYear = new Date(res.data.year).toISOString().split("T")[0];
-        let gotBorrowDate = new Date(res.data.borrowDay)
-          .toISOString()
-          .split("T")[0];
-        console.log("data got từ handleEdit: ", res.data);
+        const gotYear = moment(res.data.year).format("YYYY-MM-DD");
+        const gotBorrowDate = moment(res.data.borrowDay).format("YYYY-MM-DD");
         setInForBook({
           ...res.data,
           year: gotYear,
@@ -60,6 +84,7 @@ const LBManager = () => {
       })
       .catch((err) => console.log("lỗi trong lấy data trong edit: ", err));
   }
+
   return (
     <div>
       <h2 className="m-4">Library Mangagement</h2>
@@ -75,11 +100,20 @@ const LBManager = () => {
         books={books}
         handleDelete={handleDelete}
         handleEdit={handleEdit}
+        handleChange={handleChange}
+        rentingbook={rentingbook}
+        setRentingBook={setRentingBook}
+        setRentingBooks={setRentingBooks}
+        fetchData={fetchData}
       />
       <div className="mx-auto">
         <h2 className="text-center mt-4">BORROWED BOOKS</h2>
       </div>
-      <BorrowedBooks books={books} />
+      <BorrowedBooks
+        rentingbooks={rentingbooks}
+        books={books}
+        fetchRentingBook={fetchRentingBook}
+      />
     </div>
   );
 };

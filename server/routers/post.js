@@ -1,18 +1,29 @@
 import { Router } from "express";
 import {
-  deleteRequest,
-  getGivenRequest,
-  getRequest,
-  postRequest,
-  putRequest,
-} from "../controller/APIrequests.js";
+  getBooks,
+  createBook,
+  getGivenBook,
+  updateBook,
+  deleteBook,
+} from "../controller/books.js";
+import {
+  getRentingBooks,
+  createRentingBook,
+  deleteRentingBook,
+} from "../controller/rentingbooks.js";
 
 const router = Router();
+//-------------BOOK MODEL---------------------
+router.get("/books", getBooks);
+router.post("/books/create", createBook);
+router.get("/books/:id/:name", getGivenBook);
+router.get("/books/:id", getGivenBook);
+router.get("/books/:name", getGivenBook);
+router.put("/books/update/:id/", updateBook);
+router.delete("/books/delete/:id", deleteBook);
 
-router.get("/books", getRequest);
-router.post("/books", postRequest);
-router.get("/books/:id", getGivenRequest);
-router.put("/books/update/:id", putRequest);
-router.delete("/books/:id", deleteRequest);
-
+//------------RENTING BOOK MODEL----------------
+router.get("/rentingbooks/", getRentingBooks);
+router.post("/rentingbooks/create", createRentingBook);
+router.delete("/rentingbooks/delete/:id", deleteRentingBook);
 export default router;

@@ -14,16 +14,16 @@ app.use(express.json());
 app.use(Cors());
 
 mongoose
-  .connect(URI)
+  .connect("mongodb://localhost:27017")
   .then(() => {
-    app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
-    });
+    console.log("connecting database successfully");
   })
   .catch((err) => {
-    console.log("Error from connecting database !", err);
+    console.error("Error from connecting database !", err);
   });
+
 app.use(router);
-app.get("/", (req, res) => {
-  console.log("done /");
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });

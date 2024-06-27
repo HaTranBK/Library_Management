@@ -1,15 +1,28 @@
 // import React from 'react'
+import moment from "moment";
 import PropTypes from "prop-types";
-const BorrowedBooks = ({ books }) => {
+import HistoryModel from "../model/HistoryModel";
+import { useState } from "react";
+
+const BorrowedBooks = ({ books, rentingbooks, fetchRentingBook }) => {
+  const [show, setShow] = useState(false);
+  const [passedname, setPassedName] = useState("");
+  const handleClose = () => {
+    setShow(false);
+  };
+  const handleOnDetail = (name_) => {
+    setShow(true);
+    setPassedName(name_);
+  };
   return (
     <div className="container">
       <table className="table">
         <thead>
           <tr>
             <th scope="col">#</th>
-            <th scope="col">_ID</th>
+            <th scope="col">Book name</th>
             <th scope="col">Borrowed day</th>
-            <th scope="col">Status</th>
+            <th scope="col">History</th>
           </tr>
         </thead>
         <tbody>
@@ -18,10 +31,15 @@ const BorrowedBooks = ({ books }) => {
               return (
                 <tr key={idx}>
                   <td>{idx + 1}</td>
-                  <td>{book._id}</td>
-                  <td>{book.borrowDay}</td>
-                  <td className="text-danger">
-                    {book.status ? "Đã trả" : "Chưa trả"}
+                  <td>{book.name}</td>
+                  <td>{moment(book.borrowDay).format("DD/MM/YYYY")}</td>
+                  <td>
+                    <button
+                      className="btn btn-success"
+                      onClick={() => handleOnDetail(book.name)}
+                    >
+                      Detail
+                    </button>
                   </td>
                 </tr>
               );
@@ -29,10 +47,21 @@ const BorrowedBooks = ({ books }) => {
           })}
         </tbody>
       </table>
+      <HistoryModel
+        bookname={passedname}
+        show={show}
+        handleClose={handleClose}
+        rentingbooks={rentingbooks}
+        fetchRentingBook={fetchRentingBook}
+      />
     </div>
   );
 };
+
 BorrowedBooks.propTypes = {
   books: PropTypes.array.isRequired,
+  rentingbooks: PropTypes.array.isRequired,
+  fetchRentingBook: PropTypes.func.isRequired,
 };
+
 export default BorrowedBooks;
